@@ -31,9 +31,17 @@ tagged release so fixes, tests, and security warnings stay versioned together.
 ## Requirements
 
 - Python 3.10 or later.
-- No third-party Python packages.
+- No collector-specific runtime packages. Python must have access to an IANA
+  timezone database.
 - An Atlassian account that can open the global Jira Automation Audit Log.
 - A classic Atlassian API token owned by that account.
+
+Most Linux and macOS installations provide IANA timezone data through the
+operating system. A clean Windows Python installation may need:
+
+```powershell
+py -m pip install tzdata
+```
 
 ## Authentication
 

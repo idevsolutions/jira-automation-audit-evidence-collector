@@ -23,6 +23,8 @@ for its CLI and output contracts.
   `IN_PROGRESS` records.
 - Schema-only inspection that does not write tenant values.
 - Privacy-safe output mapping and fail-closed schema validation.
+- Explicit Windows guidance for installing the IANA `tzdata` database when it
+  is not supplied by the Python installation.
 
 [Unreleased]: https://github.com/idevsolutions/jira-automation-audit-evidence-collector/compare/v0.2.0...HEAD
 [0.2.0]: https://github.com/idevsolutions/jira-automation-audit-evidence-collector/releases/tag/v0.2.0

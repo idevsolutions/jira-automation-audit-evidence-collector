@@ -895,7 +895,10 @@ def parse_args() -> argparse.Namespace:
     try:
         args.zone = ZoneInfo(args.timezone)
     except ZoneInfoNotFoundError:
-        parser.error("--timezone must be a valid IANA timezone, for example America/Sao_Paulo")
+        parser.error(
+            "--timezone must be a valid IANA timezone, for example America/Sao_Paulo; "
+            "on Windows, install the timezone database with: py -m pip install tzdata"
+        )
     return args
 
 

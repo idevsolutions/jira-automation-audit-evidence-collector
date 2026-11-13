@@ -15,7 +15,9 @@ public issue.
 
 ## Development
 
-The project requires Python 3.10 or later and uses only the standard library.
+The project requires Python 3.10 or later and the IANA timezone database. On a
+clean Windows Python installation, run `py -m pip install tzdata` first. The
+collector itself otherwise uses only the standard library.
 
 ```powershell
 py -m unittest discover -s tests -p "test_*.py"
