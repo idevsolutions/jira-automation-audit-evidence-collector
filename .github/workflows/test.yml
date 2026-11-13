@@ -31,3 +31,17 @@ jobs:
         run: python -m unittest discover -s tests -p "test_*.py"
       - name: Check CLI version
         run: python collect_automation_audit.py --version
+
+  required-check:
+    name: Tests passed
+    if: ${{ always() }}
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verify the complete test matrix
+        shell: bash
+        run: |
+          if [[ "${{ needs.test.result }}" != "success" ]]; then
+            echo "One or more operating-system/Python test jobs failed."
+            exit 1
+          fi
