@@ -1,0 +1,251 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/idevsolutions/jira-automation-audit-evidence-collector/blob/v0.2.0/schemas/automation-audit-detail-0.2.schema.json",
+  "title": "Jira Automation audit detail bundle 0.2",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "generatedAt",
+    "source",
+    "period",
+    "coverage",
+    "rules",
+    "executions"
+  ],
+  "properties": {
+    "schemaVersion": { "const": "automation-audit-detail/0.2" },
+    "generatedAt": { "type": "string", "format": "date-time" },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["family", "siteFingerprint", "authentication"],
+      "properties": {
+        "family": { "const": "jira-automation-internal-api" },
+        "siteFingerprint": { "$ref": "#/$defs/sha256" },
+        "authentication": { "const": "basic-api-token" }
+      }
+    },
+    "period": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["fromTime", "toTime", "displayTimezone"],
+      "properties": {
+        "fromTime": { "type": "string", "format": "date-time" },
+        "toTime": { "type": "string", "format": "date-time" },
+        "displayTimezone": { "type": "string", "minLength": 1 }
+      }
+    },
+    "coverage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "pages",
+        "collectionId",
+        "partNumber",
+        "totalParts",
+        "collectionExecutions",
+        "listedExecutions",
+        "detailedExecutions",
+        "uniqueRules",
+        "skippedNonExecutionRecords",
+        "skippedInProgressRecords",
+        "truncatedByMaxRecords",
+        "selectionMode",
+        "selectedRuleIds"
+      ],
+      "properties": {
+        "pages": { "$ref": "#/$defs/nonNegativeInteger" },
+        "collectionId": { "$ref": "#/$defs/sha256" },
+        "partNumber": { "type": "integer", "minimum": 1 },
+        "totalParts": { "type": "integer", "minimum": 1 },
+        "collectionExecutions": { "$ref": "#/$defs/nonNegativeInteger" },
+        "listedExecutions": { "$ref": "#/$defs/nonNegativeInteger" },
+        "detailedExecutions": { "$ref": "#/$defs/nonNegativeInteger" },
+        "uniqueRules": { "$ref": "#/$defs/nonNegativeInteger" },
+        "skippedNonExecutionRecords": { "$ref": "#/$defs/nonNegativeInteger" },
+        "skippedInProgressRecords": { "$ref": "#/$defs/nonNegativeInteger" },
+        "truncatedByMaxRecords": { "type": "boolean" },
+        "selectionMode": { "enum": ["ALL_RULES", "RULE_IDS"] },
+        "selectedRuleIds": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/uuid" },
+          "uniqueItems": true
+        }
+      }
+    },
+    "rules": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/rule" }
+    },
+    "executions": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/execution" }
+    }
+  },
+  "$defs": {
+    "nonNegativeInteger": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "uuid": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "stringOrInteger": {
+      "type": ["string", "integer"]
+    },
+    "componentReference": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": false,
+      "properties": {
+        "id": { "$ref": "#/$defs/stringOrInteger" },
+        "type": { "$ref": "#/$defs/stringOrInteger" },
+        "parentId": { "$ref": "#/$defs/stringOrInteger" },
+        "componentType": { "$ref": "#/$defs/stringOrInteger" }
+      }
+    },
+    "ruleNode": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["conditions", "children"],
+      "properties": {
+        "id": { "$ref": "#/$defs/stringOrInteger" },
+        "parentId": { "$ref": "#/$defs/stringOrInteger" },
+        "conditionParentId": { "$ref": "#/$defs/stringOrInteger" },
+        "component": { "$ref": "#/$defs/stringOrInteger" },
+        "type": { "$ref": "#/$defs/stringOrInteger" },
+        "schemaVersion": { "$ref": "#/$defs/stringOrInteger" },
+        "conditions": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/ruleNode" }
+        },
+        "children": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/ruleNode" }
+        }
+      }
+    },
+    "rule": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "ruleIdUuid",
+        "state",
+        "billingType",
+        "canOtherRuleTrigger",
+        "scope",
+        "trigger",
+        "components"
+      ],
+      "properties": {
+        "ruleIdUuid": { "$ref": "#/$defs/uuid" },
+        "state": { "type": ["string", "null"] },
+        "billingType": { "type": ["string", "null"] },
+        "canOtherRuleTrigger": { "type": ["boolean", "null"] },
+        "scope": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["resourceCount", "kinds"],
+          "properties": {
+            "resourceCount": { "$ref": "#/$defs/nonNegativeInteger" },
+            "kinds": {
+              "type": "array",
+              "items": { "enum": ["PROJECT", "SPACE", "SITE", "OTHER"] },
+              "uniqueItems": true
+            }
+          }
+        },
+        "trigger": { "$ref": "#/$defs/ruleNode" },
+        "components": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/ruleNode" }
+        }
+      }
+    },
+    "change": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": false,
+      "properties": {
+        "childComponent": { "$ref": "#/$defs/componentReference" },
+        "stateChange": { "type": "string" },
+        "payload": {
+          "type": "object",
+          "minProperties": 1,
+          "additionalProperties": false,
+          "properties": {
+            "type": { "type": "string" },
+            "key": { "type": "string" },
+            "parameterCount": { "$ref": "#/$defs/nonNegativeInteger" }
+          }
+        }
+      }
+    },
+    "componentLog": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["component", "associatedItemCount", "changes"],
+      "properties": {
+        "component": { "$ref": "#/$defs/componentReference" },
+        "nameKey": { "type": ["string", "integer", "number", "boolean"] },
+        "totalDuration": { "type": ["string", "integer", "number", "boolean"] },
+        "totalExecutions": { "type": ["string", "integer", "number", "boolean"] },
+        "startTime": { "type": ["string", "integer", "number", "boolean"] },
+        "iteration": { "type": ["string", "integer", "number", "boolean"] },
+        "resurrected": { "type": ["string", "integer", "number", "boolean"] },
+        "associatedItemCount": { "$ref": "#/$defs/nonNegativeInteger" },
+        "changes": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/change" }
+        },
+        "executionResult": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "errorType": { "type": "string" },
+            "auditEventErrorType": { "type": "string" },
+            "state": { "type": "string" },
+            "continuation": { "type": "string" }
+          }
+        }
+      }
+    },
+    "execution": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "auditLogId",
+        "ruleIdUuid",
+        "status",
+        "startTime",
+        "endTime",
+        "durationMs",
+        "associatedItemCount",
+        "componentLogs"
+      ],
+      "properties": {
+        "auditLogId": { "type": "string", "minLength": 1 },
+        "ruleIdUuid": { "$ref": "#/$defs/uuid" },
+        "status": {
+          "enum": ["SUCCESS", "NO_ACTIONS_PERFORMED", "SOME_ERRORS", "ABORTED", "NO_MATCH"]
+        },
+        "startTime": { "type": "string", "format": "date-time" },
+        "endTime": { "type": "string", "format": "date-time" },
+        "durationMs": { "$ref": "#/$defs/nonNegativeInteger" },
+        "associatedItemCount": { "$ref": "#/$defs/nonNegativeInteger" },
+        "componentLogs": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/componentLog" }
+        },
+        "reportedSteps": { "$ref": "#/$defs/nonNegativeInteger" },
+        "stepUsageStatus": { "type": "string", "minLength": 1, "maxLength": 80 }
+      }
+    }
+  }
+}
